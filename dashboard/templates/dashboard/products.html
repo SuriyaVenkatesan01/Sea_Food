@@ -1,0 +1,40 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Products{% endblock %}
+{% block portal_section %}Products{% endblock %}
+{% block content %}
+<section class="dashboard-page">
+  <div class="wrap dashboard-wrap">
+    <header class="dashboard-heading">
+      <div><span class="eyebrow">CATALOG & STOCK</span><h1>Products</h1><p>Manage your seafood, prices, and inventory.</p></div>
+      <div class="dashboard-actions"><a class="button button-outline" href="{% url 'dashboard:overview' %}">Dashboard</a><a class="button button-green" href="{% url 'dashboard:product_create' %}">Add product <span>+</span></a></div>
+    </header>
+    <form class="dashboard-filter" method="get">
+      <label class="sr-only" for="product-search">Search products</label>
+      <input id="product-search" name="q" value="{{ query }}" placeholder="Search product name">
+      <label class="sr-only" for="product-category">Category</label>
+      <select id="product-category" name="category"><option value="">All categories</option>{% for value, label in categories %}<option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+      <label class="sr-only" for="product-availability">Availability</label>
+      <select id="product-availability" name="availability"><option value="">All products</option><option value="active" {% if availability == "active" %}selected{% endif %}>Active</option><option value="inactive" {% if availability == "inactive" %}selected{% endif %}>Hidden</option></select>
+      <button class="button button-green" type="submit">Filter</button>
+    </form>
+    <section class="dash-panel orders-panel">
+      <div class="panel-heading"><div><h2>Catalog</h2><p>{{ page.paginator.count }} product{{ page.paginator.count|pluralize }}</p></div></div>
+      <div class="orders-table-wrap"><table class="orders-table"><thead><tr><th>PRODUCT</th><th>CATEGORY</th><th>PRICE</th><th>STOCK</th><th>STATUS</th><th></th></tr></thead><tbody>
+      {% for product in products %}<tr>
+        <td><b>{{ product.name }}</b><small>{{ product.weight }}{% if product.is_featured %} · Featured{% endif %}</small></td>
+        <td>{{ product.get_category_display }}</td>
+        <td><b>₹{{ product.price|floatformat:2 }}</b></td>
+        <td><span class="{% if product.stock == 0 %}stock-critical{% elif product.stock <= 5 %}stock-warning{% endif %}">{{ product.stock }}</span></td>
+        <td><span class="status-badge {% if product.is_active %}status-delivered{% else %}status-cancelled{% endif %}">{% if product.is_active %}Live{% else %}Hidden{% endif %}</span></td>
+        <td><a class="panel-link" href="{% url 'dashboard:product_edit' product.id %}">Edit</a></td>
+      </tr>{% empty %}<tr><td class="table-empty" colspan="6">No matching products. Add your first product to get started.</td></tr>{% endfor %}
+      </tbody></table></div>
+    </section>
+    {% if page.has_other_pages %}<nav class="pagination" aria-label="Product pages">
+      {% if page.has_previous %}<a href="?q={{ query|urlencode }}&category={{ category|urlencode }}&availability={{ availability|urlencode }}&page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+      <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a href="?q={{ query|urlencode }}&category={{ category|urlencode }}&availability={{ availability|urlencode }}&page={{ page.next_page_number }}">Next →</a>{% endif %}
+    </nav>{% endif %}
+  </div>
+</section>
+{% endblock %}

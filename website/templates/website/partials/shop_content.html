@@ -1,0 +1,27 @@
+<div class="wrap" id="shop-content">
+  <div class="section-heading">
+    <div class="section-heading-copy"><span class="eyebrow">STRAIGHT FROM THE COAST</span><h2>Our fresh catch</h2><p>Hand-picked favourites, ready for your next great meal.</p></div>
+  </div>
+  <div class="shop-search-row">
+    <form class="search-form" method="get" action="{{ catalog_url }}">
+      {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+      <label class="sr-only" for="product-search">Search seafood</label>
+      <input id="product-search" name="q" value="{{ search }}" placeholder="Find your favourite…" type="search">
+      <button type="submit" aria-label="Search">⌕</button>
+    </form>
+  </div>
+  <nav class="category-tiles" aria-label="Filter seafood by category">
+    {% for tile in category_tiles %}
+      <a class="category-tile {% if active_category == tile.value %}active{% endif %}" href="{{ catalog_url }}{% if tile.value or search %}?{% if tile.value %}category={{ tile.value }}{% endif %}{% if tile.value and search %}&{% endif %}{% if search %}q={{ search|urlencode }}{% endif %}{% endif %}" {% if active_category == tile.value %}aria-current="true"{% endif %}>
+        <span class="category-tile-image">{% if tile.image_url %}<img src="{{ tile.image_url }}" alt="" loading="lazy">{% else %}<span aria-hidden="true">𓆝</span>{% endif %}</span>
+        <span class="category-tile-label">{{ tile.label }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+  <div class="product-grid" aria-live="polite">
+    {% include "website/partials/product_cards.html" with products=products %}
+  </div>
+  {% if not products and not search and not active_category %}
+    <p class="setup-note">Add products from the <a href="{% url 'admin:index' %}">Django admin</a> to start selling.</p>
+  {% endif %}
+</div>

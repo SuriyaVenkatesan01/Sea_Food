@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:24px;background:#fbfaf6;color:#153936;font-family:Arial,sans-serif;">
+    <main style="max-width:600px;margin:auto;padding:28px;background:#fff;border:1px solid #e8e9e3;">
+      <p style="color:#078873;font-weight:bold;">{{ company_name }} · ORDER INVOICE</p>
+      <h1 style="font-size:24px;">Thank you, {{ order.full_name }}.</h1>
+      <p>Your order reference is <strong>{{ order.reference }}</strong>.</p>
+      <table style="width:100%;border-collapse:collapse;text-align:left;">
+        <thead><tr><th style="padding:8px 0;border-bottom:1px solid #e8e9e3;">Item</th><th style="padding:8px 0;border-bottom:1px solid #e8e9e3;">Amount</th></tr></thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr><td style="padding:8px 0;">{{ item.quantity }} × {{ item.product_name }}</td><td style="padding:8px 0;">₹{{ item.line_total|floatformat:2 }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p>Subtotal: ₹{{ order.subtotal|floatformat:2 }}<br>
+        Delivery: ₹{{ order.delivery_fee|floatformat:2 }}<br>
+        <strong>Total · Pay on delivery: ₹{{ order.total|floatformat:2 }}</strong>
+      </p>
+      <p>Delivering to {{ order.address }}, {{ order.city }} {{ order.postcode }}.</p>
+      <p><a href="{{ tracking_url }}" style="display:inline-block;padding:12px 18px;background:#078873;color:#fff;text-decoration:none;">Track your order</a></p>
+      <p>For security, enter the mobile number used at checkout along with your order reference.</p>
+    </main>
+  </body>
+</html>

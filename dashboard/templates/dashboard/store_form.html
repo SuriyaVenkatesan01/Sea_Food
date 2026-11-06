@@ -1,0 +1,68 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{% if is_new %}Add store{% else %}Edit store{% endif %}{% endblock %}
+{% block portal_section %}{% if is_new %}Add store{% else %}Edit store{% endif %}{% endblock %}
+{% block content %}
+<section class="dashboard-page">
+  <div class="wrap dashboard-wrap">
+    <header class="dashboard-heading">
+      <div><span class="eyebrow">DELIVERY NETWORK</span><h1>{% if is_new %}Add a store{% else %}Edit {{ store.name }}{% endif %}</h1><p>Set the store location and its serviceable PIN codes for order routing.</p></div>
+      <a class="button button-outline" href="{% url 'dashboard:stores' %}">← Back to stores</a>
+    </header>
+    <form class="dash-panel product-form store-form" method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      <h2 class="store-form-section-title">Store details</h2>
+      <div class="product-form-grid">
+      {% for field in form %}
+        <div class="dashboard-field {% if field.name == 'address' %}field-wide{% endif %} {% if field.field.widget.input_type == 'checkbox' %}checkbox-field{% endif %}">
+          {% if field.field.widget.input_type == 'checkbox' %}{{ field }}{{ field.label_tag }}{% else %}{{ field.label_tag }}{{ field }}{% endif %}
+          {% if field.name == 'latitude' or field.name == 'longitude' %}<small>Use the store's map coordinates to assign the nearest serving store when customers choose location.</small>{% elif field.name == 'delivery_radius_km' %}<small>Maximum distance from this store for location-based routing.</small>{% endif %}
+          {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+        </div>
+      {% endfor %}
+      </div>
+
+      <div class="store-pincode-heading">
+        <div><h2 class="store-form-section-title">Service PIN codes</h2><p>Add every PIN this store serves. A PIN can be shared by multiple stores.</p></div>
+        <button class="button button-outline" type="button" data-add-pincode>Add another PIN</button>
+      </div>
+      <div data-pincode-management>{{ formset.management_form }}</div>
+      {% if formset.non_form_errors %}<div class="form-errors">{{ formset.non_form_errors }}</div>{% endif %}
+      <div class="store-pincode-list" data-pincode-list>
+        {% for pin_form in formset %}
+          <div class="store-pincode-row" data-pincode-row>
+            {% for hidden in pin_form.hidden_fields %}{{ hidden }}{% endfor %}
+            {% for field in pin_form.visible_fields %}
+              {% if field.name != "DELETE" %}
+                <div class="dashboard-field">{% if field.name == "priority" %}<label for="{{ field.id_for_label }}">PIN-only priority</label>{% else %}{{ field.label_tag }}{% endif %}{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+              {% endif %}
+            {% endfor %}
+            <label class="store-pin-delete">{{ pin_form.DELETE }} Remove</label>
+          </div>
+        {% endfor %}
+      </div>
+      <template data-empty-pincode-row>
+        <div class="store-pincode-row" data-pincode-row>
+          {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+          {% for field in formset.empty_form.visible_fields %}
+            {% if field.name != "DELETE" %}
+              <div class="dashboard-field">{% if field.name == "priority" %}<label for="{{ field.id_for_label }}">PIN-only priority</label>{% else %}{{ field.label_tag }}{% endif %}{{ field }}</div>
+            {% endif %}
+          {% endfor %}
+          <label class="store-pin-delete">{{ formset.empty_form.DELETE }} Remove</label>
+        </div>
+      </template>
+      <div class="product-form-actions"><a class="button button-outline" href="{% url 'dashboard:stores' %}">Cancel</a><button class="button button-green" type="submit">{% if is_new %}Add store{% else %}Save store{% endif %}</button></div>
+    </form>
+  </div>
+</section>
+<script>
+document.querySelector("[data-add-pincode]").addEventListener("click", () => {
+  const totalForms = document.querySelector('[data-pincode-management] input[name$="-TOTAL_FORMS"]');
+  const index = Number(totalForms.value);
+  const template = document.querySelector("[data-empty-pincode-row]").innerHTML.replaceAll("__prefix__", index);
+  document.querySelector("[data-pincode-list]").insertAdjacentHTML("beforeend", template);
+  totalForms.value = index + 1;
+});
+</script>
+{% endblock %}

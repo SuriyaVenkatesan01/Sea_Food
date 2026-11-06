@@ -1,0 +1,27 @@
+{% extends "website/base.html" %}
+{% block title %}Fresh seafood delivered | Tide & Table{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-shade"></div>
+  <div class="hero-content wrap">
+    <span class="eyebrow light-eyebrow"><span class="eyebrow-dot"></span> THE DAY’S FRESHEST CATCH</span>
+    <h1>From the ocean<br>to your <em>table.</em></h1>
+    <p>Beautifully fresh seafood, responsibly sourced and delivered chilled to your door.</p>
+    <a class="button button-light" href="{% url 'website:products' %}">Explore the catch <span>→</span></a>
+    <div class="hero-note"><span>✦</span> Packed fresh. Never frozen.</div>
+  </div>
+</section>
+<section class="trust-strip wrap" aria-label="Our service highlights">
+  <div><span class="trust-icon">✦</span><span><b>Fresh, always</b><small>Carefully sourced daily</small></span></div>
+  <div><span class="trust-icon">⌁</span><span><b>Kept chilled</b><small>Cold-chain delivery</small></span></div>
+  <div><span class="trust-icon">♡</span><span><b>Kitchen ready</b><small>Cleaned with care</small></span></div>
+  <div><span class="trust-icon">↗</span><span><b>At your doorstep</b><small>Fast local delivery</small></span></div>
+</section>
+<section class="shop-section" id="shop">
+  {% include "website/partials/shop_content.html" %}
+</section>
+<section class="promise-band">
+  <div class="wrap promise-inner"><div><span class="eyebrow light-eyebrow">BETTER SEAFOOD, BETTER DAYS</span><h2>A little closer to the coast.</h2><p>We work with trusted fishers and handle every order with care, so all you need to do is bring the recipes.</p><a class="button button-light" href="{% url 'website:about' %}">Our story <span>→</span></a></div><div class="promise-stamp">CAUGHT<br>WITH CARE<span>✦</span></div></div>
+  </div>
+</section>
+{% endblock %}

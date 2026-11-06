@@ -1,0 +1,25 @@
+{% extends "website/base.html" %}
+{% block title %}Sign in | Tide & Table{% endblock %}
+{% block content %}
+<section class="auth-login-page">
+  <img class="login-background-image" src="https://plus.unsplash.com/premium_photo-1717345994192-f5bc10b61c09?auto=format&amp;fit=crop&amp;w=2000&amp;q=85" alt="" aria-hidden="true" fetchpriority="high">
+  <div class="login-background-overlay" aria-hidden="true"></div>
+  <div class="wrap login-layout">
+    <div class="auth-card">
+      <div class="auth-heading"><span class="eyebrow">YOUR TABLE IS WAITING</span><h2>Welcome back.</h2><p>Sign in to place orders or manage the store. Your account will take you to the right dashboard.</p></div>
+      <form method="post" class="auth-form">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+        {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+          <div class="auth-field">
+            {{ field.label_tag }}{{ field }}
+            {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+          </div>
+        {% endfor %}
+        <button class="button button-green button-full" type="submit">Sign in <span>→</span></button>
+      </form>
+      <p class="auth-switch">New to Tide & Table? <a href="{% url 'website:register' %}">Create an account</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

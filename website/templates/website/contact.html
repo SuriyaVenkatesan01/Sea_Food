@@ -1,0 +1,62 @@
+{% extends "website/base.html" %}
+{% block title %}Contact us | Tide & Table{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="wrap"><span class="eyebrow light-eyebrow">WE’RE HERE TO HELP</span><h1>Contact us</h1></div></section>
+<section class="contact-section" id="contact">
+  <div class="wrap">
+    <header class="contact-heading">
+      <span class="eyebrow">LET’S TALK SEAFOOD</span>
+      <h2>How can we help?</h2>
+      <p>Questions about an order or today’s catch? Send us a message and our team will get back to you.</p>
+    </header>
+    <div class="contact-layout">
+      <div class="contact-details">
+        <article class="contact-detail-card">
+          <span class="contact-detail-icon">✉</span>
+          <div><h3>Email us</h3><a href="mailto:hello@tideandtable.example">hello@tideandtable.example</a></div>
+        </article>
+        <article class="contact-detail-card">
+          <span class="contact-detail-icon">◷</span>
+          <div><h3>Store hours</h3><p>Monday–Sunday · 7:00 AM–9:00 PM</p></div>
+        </article>
+        <article class="contact-detail-card contact-location-card">
+          <span class="contact-detail-icon">⌖</span>
+          <div><h3>Our location <span class="sample-location-label">Sample</span></h3>
+            <p>Chennai, Tamil Nadu, India</p>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Chennai%2C%20Tamil%20Nadu%2C%20India" target="_blank" rel="noopener noreferrer">View sample location on map <span>↗</span></a>
+            <small>Replace this sample with your store’s public address before launch.</small>
+          </div>
+        </article>
+      </div>
+      <form class="contact-form" method="post" action="{% url 'website:contact_submit' %}" data-contact-invalid="{{ contact_form_invalid|yesno:'true,false' }}">
+        {% csrf_token %}
+        <div class="contact-form-heading"><h3>Send us a message</h3><p>We usually reply during store hours.</p></div>
+        {% if contact_form.non_field_errors %}<div class="form-errors">{{ contact_form.non_field_errors }}</div>{% endif %}
+        <div class="contact-form-grid">
+          <div class="contact-field">
+            {{ contact_form.name.label_tag }}{{ contact_form.name }}
+            {% for error in contact_form.name.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+          </div>
+          <div class="contact-field">
+            {{ contact_form.email.label_tag }}{{ contact_form.email }}
+            {% for error in contact_form.email.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+          </div>
+          <div class="contact-field">
+            {{ contact_form.phone.label_tag }}{{ contact_form.phone }}
+            {% for error in contact_form.phone.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+          </div>
+          <div class="contact-field">
+            {{ contact_form.subject.label_tag }}{{ contact_form.subject }}
+            {% for error in contact_form.subject.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+          </div>
+          <div class="contact-field contact-field-wide">
+            {{ contact_form.message.label_tag }}{{ contact_form.message }}
+            {% for error in contact_form.message.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+          </div>
+        </div>
+        <button class="button button-green contact-submit" type="submit">Send message <span>→</span></button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

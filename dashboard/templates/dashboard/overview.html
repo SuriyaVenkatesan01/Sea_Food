@@ -1,0 +1,50 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Store overview{% endblock %}
+{% block portal_section %}Overview{% endblock %}
+{% block content %}
+<section class="dashboard-page">
+  <div class="wrap dashboard-wrap">
+    <header class="dashboard-heading">
+      <div><span class="eyebrow">YOUR STORE AT A GLANCE</span><h1>Store dashboard</h1><p>Monitor sales, stock, and every customer order from one place.</p></div>
+      <div class="dashboard-actions"><a class="button button-outline" href="{% url 'dashboard:orders' %}">Track orders</a><a class="button button-green" href="{% url 'dashboard:product_create' %}">Add product <span>+</span></a></div>
+    </header>
+    <div class="metric-grid">
+      <article class="metric-card"><div class="metric-top"><span>All-time sales</span><span class="metric-icon mint">₹</span></div><strong>₹{{ sales_total|floatformat:0 }}</strong><small>Excluding cancelled orders</small><span class="metric-accent">↗</span></article>
+      <article class="metric-card"><div class="metric-top"><span>Sales this month</span><span class="metric-icon coral">◷</span></div><strong>₹{{ month_sales|floatformat:0 }}</strong><small>Month to date</small><span class="metric-accent">↗</span></article>
+      <article class="metric-card"><div class="metric-top"><span>Total orders</span><span class="metric-icon blue">▤</span></div><strong>{{ order_count }}</strong><small>{{ pending_count }} need your attention</small><span class="metric-accent">↗</span></article>
+      <article class="metric-card"><div class="metric-top"><span>Live products</span><span class="metric-icon sand">𓆝</span></div><strong>{{ product_count }}</strong><small>Available in your shop</small><span class="metric-accent">↗</span></article>
+    </div>
+    <div class="dashboard-grid">
+      <section class="dash-panel sales-panel">
+        <div class="panel-heading"><div><h2>Sales this week</h2><p>A little look at your last 7 days</p></div><span class="panel-chip">LAST 7 DAYS</span></div>
+        <div class="chart-summary"><strong>₹{{ max_day_sales|floatformat:0 }}</strong><span>best day</span></div>
+        <div class="sales-chart" aria-label="Sales by day">
+          {% for day in daily_sales %}<div class="chart-column"><span class="chart-value">{% if day.amount %}₹{{ day.amount|floatformat:0 }}{% endif %}</span><div class="chart-track"><span class="chart-bar {% if day.height == 100 %}chart-bar-best{% endif %}" style="height:{% if day.height %}{{ day.height }}{% else %}3{% endif %}%"></span></div><span class="chart-label">{{ day.label }}</span></div>{% endfor %}
+        </div>
+      </section>
+      <section class="dash-panel inventory-panel">
+        <div class="panel-heading"><div><h2>Stock watch</h2><p>Keep these favourites stocked</p></div><span class="stock-alert">● {{ low_stock_count }} LOW</span></div>
+        {% for product in low_stock %}<div class="inventory-row"><span class="inventory-dot {% if product.stock == 0 %}dot-empty{% endif %}"></span><div><b>{{ product.name }}</b><small>{{ product.get_category_display }}</small></div><strong class="{% if product.stock <= 2 %}stock-critical{% endif %}">{{ product.stock }} left</strong></div>{% empty %}
+          <div class="inventory-clear"><span>✓</span><div><b>All stocked up</b><small>No products are running low right now.</small></div></div>
+        {% endfor %}
+        <a class="panel-link" href="{% url 'dashboard:products' %}">Manage inventory <span>→</span></a>
+      </section>
+    </div>
+    <section class="dash-panel orders-panel">
+      <div class="panel-heading"><div><h2>Recent orders</h2><p>Track and update your latest deliveries</p></div><a class="panel-link" href="{% url 'dashboard:orders' %}">All orders <span>→</span></a></div>
+      <div class="orders-table-wrap"><table class="orders-table"><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>STORE</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th><th>UPDATE</th></tr></thead><tbody>
+      {% for order in recent_orders %}<tr>
+        <td><b>#{{ order.reference }}</b><small>{{ order.created_at|date:"M j, g:i A" }}</small></td>
+        <td>{{ order.full_name }}<small>{{ order.phone }}</small></td>
+        <td>{{ order.store.name|default:"—" }}</td>
+        <td>{% for item in order.items.all %}{{ item.quantity }} × {{ item.product_name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+        <td><b>₹{{ order.total|floatformat:0 }}</b></td>
+        <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+        <td>{% if order.status != "cancelled" %}<form class="status-form" method="post" action="{% url 'dashboard:update_order_status' order.id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><label class="sr-only" for="status-{{ order.id }}">Update order status</label><select name="status" id="status-{{ order.id }}" onchange="this.form.submit()">{% for value, label in status_choices %}<option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></form>{% else %}<span class="muted-text">Closed</span>{% endif %}</td>
+      </tr>{% empty %}<tr><td class="table-empty" colspan="6">No orders yet. Your first order will show up here.</td></tr>{% endfor %}
+      </tbody></table></div>
+    </section>
+    <p class="dashboard-footnote">Your inventory alerts when active products have five or fewer items in stock.</p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "website/base.html" %}
+{% block title %}Track your orders | Tide & Table{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="wrap"><span class="eyebrow light-eyebrow">FROM OUR KITCHEN TO YOUR DOOR</span><h1>Track your orders</h1></div></section>
+<section class="wrap page-section tracking-section">
+  <div class="tracking-search">
+    <div><span class="eyebrow">CUSTOMER ORDER TRACKING</span><h2>Check your latest catch.</h2><p>Enter the mobile number registered to your account to see its orders and delivery status.</p></div>
+    <form method="post" class="tracking-form">
+      {% csrf_token %}
+      <label class="field">Registered mobile number
+        <input type="tel" name="phone" required autocomplete="tel" value="{{ profile.phone }}" placeholder="Your registered phone number">
+      </label>
+      <button class="button button-green" type="submit">Find my orders <span>→</span></button>
+    </form>
+  </div>
+  {% if orders %}
+    <div class="tracking-results"><div class="tracking-title"><h2>Your orders</h2><span>{{ orders|length }} found</span></div>
+      {% for order in orders %}
+        <article class="tracking-order">
+          <div class="tracking-order-head"><div><span class="eyebrow">ORDER REFERENCE</span><h3>#{{ order.reference }}</h3></div><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></div>
+          <div class="tracking-meta"><span>Placed {{ order.created_at|date:"M j, Y · g:i A" }}</span><span>{{ order.items.count }} item{{ order.items.count|pluralize }}</span><b>₹{{ order.total|floatformat:0 }}</b></div>
+          <div class="tracking-products">{% for item in order.items.all %}<span>{{ item.quantity }} × {{ item.product_name }}</span>{% endfor %}</div>
+          {% if order.status == "cancelled" %}<p class="tracking-update tracking-cancelled">This order was cancelled. Contact our team if you have any questions.</p>
+          {% else %}{% include "website/partials/tracking_timeline.html" %}{% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

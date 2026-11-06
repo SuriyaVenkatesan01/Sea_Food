@@ -1,0 +1,37 @@
+{% extends "website/base.html" %}
+{% block title %}Your basket | Tide & Table{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="wrap"><span class="eyebrow light-eyebrow">A GOOD MEAL STARTS HERE</span><h1>Your basket</h1></div></section>
+<section class="wrap page-section">
+  {% if items %}
+  <div class="cart-layout">
+    <div class="cart-items">
+      <div class="cart-table-head"><span>Your seafood ({{ cart_count }} items)</span><a href="{% url 'website:products' %}">Continue shopping</a></div>
+      {% for item in items %}
+      <article class="cart-row">
+        <div class="cart-thumb">{% if item.product.image_url %}<img src="{{ item.product.image_url }}" alt="">{% else %}𓆝{% endif %}</div>
+        <div class="cart-product"><b>{{ item.product.name }}</b><span>{{ item.product.weight }} · ₹{{ item.product.price|floatformat:0 }} each</span></div>
+        <form class="quantity-form" method="post" action="{% url 'website:update_cart' item.product.id %}">
+          {% csrf_token %}<label class="sr-only" for="quantity-{{ item.product.id }}">Quantity</label>
+          <input id="quantity-{{ item.product.id }}" name="quantity" type="number" min="0" max="{{ item.product.stock }}" value="{{ item.quantity }}" onchange="this.form.submit()">
+        </form>
+        <b class="line-price">₹{{ item.product.price|floatformat:0 }}</b>
+        <form method="post" action="{% url 'website:remove_from_cart' item.product.id %}">{% csrf_token %}<button class="remove-button" type="submit" aria-label="Remove {{ item.product.name }}">×</button></form>
+      </article>
+      {% endfor %}
+      <p class="cart-hint">Need to remove an item? Set its quantity to 0.</p>
+    </div>
+    <aside class="summary-card">
+      <h2>Order summary</h2><div class="summary-line"><span>Subtotal</span><b>₹{{ subtotal|floatformat:0 }}</b></div>
+      <div class="summary-line"><span>Delivery</span><b>{% if delivery_fee %}₹{{ delivery_fee|floatformat:0 }}{% else %}Free{% endif %}</b></div>
+      {% if subtotal < 799 %}<p class="delivery-hint">Add ₹{{ free_delivery_remaining|floatformat:0 }} worth of seafood for free delivery.</p>{% endif %}
+      <div class="summary-total"><span>Total</span><b>₹{{ total|floatformat:0 }}</b></div>
+      <a class="button button-green button-full" href="{% url 'website:checkout' %}">Continue to checkout <span>→</span></a>
+      <p class="secure-note"><svg class="secure-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 1 1 8 0v3"></path></svg> Secure checkout · Pay on delivery</p>
+    </aside>
+  </div>
+  {% else %}
+  <div class="empty-state cart-empty"><span class="cart-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path></svg></span><h2>Your basket is waiting for a catch</h2><p>Browse today’s fresh seafood and find something delicious.</p><a class="button button-green" href="{% url 'website:products' %}">Shop today’s catch</a></div>
+  {% endif %}
+</section>
+{% endblock %}

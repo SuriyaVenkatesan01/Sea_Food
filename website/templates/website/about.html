@@ -1,0 +1,20 @@
+{% extends "website/base.html" %}
+{% block title %}About us | Tide & Table{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="wrap"><span class="eyebrow light-eyebrow">BETTER SEAFOOD, BETTER DAYS</span><h1>About Tide & Table</h1></div></section>
+<section class="about-section">
+  <div class="wrap about-story">
+    <div class="about-story-copy">
+      <span class="eyebrow">A LITTLE CLOSER TO THE COAST</span>
+      <h2>Good seafood should feel simple.</h2>
+      <p>We bring the day’s freshest catch straight to your kitchen. We work with trusted fishers and handle every order with care, so choosing and enjoying seafood can be the easiest part of your day.</p>
+      <a class="button button-green" href="{% url 'website:products' %}">Explore our fresh catch <span>→</span></a>
+    </div>
+    <div class="about-values">
+      <article><span class="trust-icon">✦</span><div><h3>Fresh, always</h3><p>Carefully sourced seafood, selected with quality in mind.</p></div></article>
+      <article><span class="trust-icon">⌁</span><div><h3>Kept chilled</h3><p>Thoughtful handling helps keep every order fresh on its way to you.</p></div></article>
+      <article><span class="trust-icon">♡</span><div><h3>Kitchen ready</h3><p>Prepared with care and ready to become part of your next meal.</p></div></article>
+    </div>
+  </div>
+</section>
+{% endblock %}

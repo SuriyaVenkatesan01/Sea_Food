@@ -1,0 +1,34 @@
+{% extends "website/base.html" %}
+{% block title %}Track an order | Tide & Table{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="wrap"><span class="eyebrow light-eyebrow">ORDER UPDATES</span><h1>Track your order</h1></div></section>
+<section class="wrap page-section tracking-section">
+  <div class="tracking-search">
+    <div><span class="eyebrow">GUEST ORDER TRACKING</span><h2>Your order, in the know.</h2><p>Track without signing in. Enter your six-character order reference or the mobile number used at checkout.</p></div>
+    <form method="post" class="tracking-form">
+      {% csrf_token %}
+      <label class="field">Order reference or mobile number
+        <input name="lookup" required value="{% if phone %}{{ phone }}{% else %}{{ reference }}{% endif %}" autocomplete="off" placeholder="e.g. 123456 or 9876543210">
+      </label>
+      <button class="button button-green" type="submit">Track my order <span>→</span></button>
+    </form>
+  </div>
+  {% if orders %}
+    <div class="tracking-results">
+      {% if orders|length > 1 %}<div class="tracking-title"><h2>Your recent orders</h2><span>Showing up to 20 orders</span></div>{% endif %}
+    {% for order in orders %}
+      <article class="tracking-order">
+        <div class="tracking-order-head"><div><span class="eyebrow">ORDER REFERENCE</span><h3>#{{ order.reference }}</h3></div><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></div>
+        <div class="tracking-meta"><span>Placed {{ order.created_at|date:"M j, Y · g:i A" }}</span><span>{{ order.items.count }} item{{ order.items.count|pluralize }}</span><b>₹{{ order.total|floatformat:0 }}</b></div>
+        {% if order.store %}<p class="tracking-update">Serving store: {{ order.store.name }}</p>{% endif %}
+        {% if order.status == "cancelled" %}<p class="tracking-update tracking-cancelled">This order was cancelled. Contact our team if you have any questions.</p>
+        {% else %}
+          {% include "website/partials/tracking_timeline.html" %}
+        {% endif %}
+        <div class="tracking-products">{% for item in order.items.all %}<span>{{ item.quantity }} × {{ item.product_name }}</span>{% endfor %}</div>
+      </article>
+    {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

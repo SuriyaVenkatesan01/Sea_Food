@@ -1,0 +1,26 @@
+{% for product in products %}
+<article class="product-card">
+  <a class="product-image" href="#product-{{ product.id }}" aria-label="View {{ product.name }}">
+    {% if product.image_url %}<img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">{% else %}<div class="image-placeholder">𓆝</div>{% endif %}
+    {% if product.discount_percent %}<span class="discount-tag">{{ product.discount_percent }}% OFF</span>{% endif %}
+    {% if product.is_featured %}<span class="fresh-tag">TODAY’S PICK</span>{% endif %}
+  </a>
+  <div class="product-info">
+    <div class="product-category">{{ product.get_category_display }} <span>·</span> {{ product.weight }}</div>
+    <h3 id="product-{{ product.id }}">{{ product.name }}</h3>
+    <p class="product-description">{{ product.description|default:"Freshly selected and carefully prepared for your table." }}</p>
+    <div class="product-bottom">
+      <div class="price-block"><strong>₹{{ product.price|floatformat:0 }}</strong>{% if product.compare_at_price %}<del>₹{{ product.compare_at_price|floatformat:0 }}</del>{% endif %}</div>
+      {% if product.stock > 0 %}
+      <form method="post" action="{% url 'website:add_to_cart' product.id %}">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="button button-small button-green" type="submit">＋ Add</button>
+      </form>
+      {% else %}<span class="stock-out">Sold out</span>{% endif %}
+    </div>
+    {% if product.stock > 0 and product.stock <= 5 %}<div class="stock-note">Only {{ product.stock }} left today</div>{% endif %}
+  </div>
+</article>
+{% empty %}
+<div class="empty-state"><span>𓆝</span><h3>No catch found</h3><p>Try a different search or browse all seafood.</p><a class="button button-green" href="{{ catalog_url }}">See all seafood</a></div>
+{% endfor %}

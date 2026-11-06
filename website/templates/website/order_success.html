@@ -1,0 +1,12 @@
+{% extends "website/base.html" %}
+{% block title %}Order confirmed | Tide & Table{% endblock %}
+{% block content %}
+<section class="wrap page-section">
+  <div class="success-card"><span class="success-check">✓</span><span class="eyebrow">YOUR ORDER IS IN</span><h1>Thank you, {{ order.full_name|title }}.</h1><p>We’re getting your fresh catch ready. We’ll call you at <b>{{ order.phone }}</b> to confirm delivery.</p>
+    <div class="order-reference">ORDER REFERENCE <b>{{ order.reference }}</b></div>
+    <p>Save your six-character reference. To check delivery updates, use it with your mobile number on the <a href="{% url 'website:track_guest_order' %}?reference={{ order.reference }}">order tracking page</a>.{% if order.email %} We’ll also email your invoice and tracking link to {{ order.email }}.{% endif %}</p>
+    <div class="success-items">{% for item in order.items.all %}<div><span>{{ item.quantity }} × {{ item.product_name }}</span><b>₹{{ item.line_total|floatformat:0 }}</b></div>{% endfor %}<div class="success-total"><span>Total · Pay on delivery</span><b>₹{{ order.total|floatformat:0 }}</b></div></div>
+    <a class="button button-green" href="{% url 'website:home' %}">Back to the catch</a>
+  </div>
+</section>
+{% endblock %}

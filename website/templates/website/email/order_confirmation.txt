@@ -1,0 +1,19 @@
+Thank you for your order, {{ order.full_name }}.
+
+{{ company_name }} INVOICE
+Order reference: {{ order.reference }}
+Order date: {{ order.created_at|date:"M j, Y, g:i A" }}
+
+{% for item in order.items.all %}{{ item.quantity }} × {{ item.product_name }} — ₹{{ item.line_total|floatformat:2 }}
+{% endfor %}
+Subtotal: ₹{{ order.subtotal|floatformat:2 }}
+Delivery: ₹{{ order.delivery_fee|floatformat:2 }}
+Total: ₹{{ order.total|floatformat:2 }}
+Payment: Pay on delivery
+
+Delivery address:
+{{ order.full_name }}
+{{ order.address }}, {{ order.city }} {{ order.postcode }}
+
+Track your order using your six-character reference and checkout mobile number:
+{{ tracking_url }}

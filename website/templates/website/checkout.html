@@ -1,0 +1,31 @@
+{% extends "website/base.html" %}
+{% block title %}Checkout | Tide & Table{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="wrap"><span class="eyebrow light-eyebrow">ALMOST AT YOUR DOOR</span><h1>Delivery details</h1></div></section>
+<section class="wrap page-section">
+  <form method="post" class="checkout-layout">
+    {% csrf_token %}
+    <div class="checkout-card">
+      <div class="form-heading"><span class="step-number">01</span><div><h2>Where should we deliver?</h2><p>We’ll get your fresh catch to you chilled and ready. Serving {{ delivery_area.store.name }} for PIN {{ delivery_area.postcode }}{% if delivery_area.distance_km != None %} · {{ delivery_area.distance_km }} km from the store{% endif %}.</p></div></div>
+      <div class="form-grid">
+        <label class="field full-field">Full name <span>*</span><input name="full_name" required autocomplete="name" value="{{ form.full_name.value|default_if_none:'' }}" placeholder="Your name">{% for error in form.full_name.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>
+        <label class="field">Mobile number <span>*</span><input name="phone" type="tel" required autocomplete="tel" value="{{ form.phone.value|default_if_none:'' }}" placeholder="Your mobile number">{% for error in form.phone.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>
+        <label class="field">Email address<input name="email" type="email" autocomplete="email" value="{{ form.email.value|default_if_none:'' }}" placeholder="you@example.com">{% for error in form.email.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>
+        <label class="field full-field">Street address <span>*</span><input name="address" required autocomplete="street-address" value="{{ form.address.value|default_if_none:'' }}" placeholder="House number, street, area">{% for error in form.address.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>
+        <label class="field">City <span>*</span><input name="city" required autocomplete="address-level2" value="{{ form.city.value|default_if_none:'' }}" placeholder="Your city">{% for error in form.city.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>
+        <label class="field">PIN code <span>*</span><input name="postcode" required inputmode="numeric" autocomplete="postal-code" value="{{ delivery_area.postcode }}" readonly>{% for error in form.postcode.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>
+        <label class="field full-field">Anything we should know? <small>Optional</small><textarea name="notes" rows="3" placeholder="Delivery instructions or preparation preferences">{{ form.notes.value|default_if_none:'' }}</textarea>{% for error in form.notes.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>
+      </div>
+      <div class="payment-note"><span>₹</span><div><b>Pay on delivery</b><p>Payment is collected when your fresh order arrives.</p></div></div>
+    </div>
+    <aside class="summary-card checkout-summary"><h2>Your order</h2>
+      {% for item in items %}<div class="checkout-item"><span>{{ item.quantity }} × {{ item.product.name }}</span><b>₹{{ item.product.price|floatformat:0 }}</b></div>{% endfor %}
+      <div class="summary-line"><span>Subtotal</span><b>₹{{ subtotal|floatformat:0 }}</b></div>
+      <div class="summary-line"><span>Delivery</span><b>{% if delivery_fee %}₹{{ delivery_fee|floatformat:0 }}{% else %}Free{% endif %}</b></div>
+      <div class="summary-total"><span>Total</span><b>₹{{ total|floatformat:0 }}</b></div>
+      <button class="button button-green button-full" type="submit">Place my order <span>→</span></button>
+      <p class="secure-note">By placing your order, you agree to our delivery terms.</p>
+    </aside>
+  </form>
+</section>
+{% endblock %}

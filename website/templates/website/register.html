@@ -1,0 +1,23 @@
+{% extends "website/base.html" %}
+{% block title %}Create your account | Tide & Table{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="wrap"><span class="eyebrow light-eyebrow">WELCOME TO TIDE & TABLE</span><h1>Create an account</h1></div></section>
+<section class="wrap page-section auth-section">
+  <div class="auth-card">
+    <div class="auth-heading"><span class="eyebrow">YOUR FRESH CATCH STARTS HERE</span><h2>Join the table.</h2><p>Create your customer account to place and track orders.</p></div>
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="auth-field">
+          {{ field.label_tag }}{{ field }}
+          {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+          {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+        </div>
+      {% endfor %}
+      <button class="button button-green button-full" type="submit">Create my account <span>→</span></button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="{% url 'website:login' %}">Sign in</a></p>
+  </div>
+</section>
+{% endblock %}

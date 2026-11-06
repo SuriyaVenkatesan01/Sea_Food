@@ -1,0 +1,8 @@
+<ol class="tracking-timeline" aria-label="Order progress">
+  {% for step in order.tracking_steps %}
+    <li class="tracking-step tracking-step-{{ step.state }}"{% if step.state == "current" %} aria-current="step"{% endif %}>
+      <span class="tracking-step-marker">{% if step.state == "complete" %}✓{% else %}{{ forloop.counter }}{% endif %}</span>
+      <span class="tracking-step-label">{{ step.label }}</span>
+    </li>
+  {% endfor %}
+</ol>

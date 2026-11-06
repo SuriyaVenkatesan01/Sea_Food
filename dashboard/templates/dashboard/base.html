@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153936">
+  <title>{% block title %}Store portal{% endblock %} | Tide & Table</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'website/site.css' %}">
+  <link rel="stylesheet" href="{% static 'dashboard/portal.css' %}">
+</head>
+<body class="portal-body">
+  <div class="portal-layout">
+    <aside class="portal-sidebar">
+      <a class="brand portal-brand" href="{% url 'dashboard:overview' %}">
+        <span class="brand-mark">T<span>+</span></span>
+        <span>TIDE<span class="brand-amp">&</span>TABLE<small>STORE PORTAL</small></span>
+      </a>
+      <div class="portal-nav-label">STORE MANAGEMENT</div>
+      <nav class="portal-nav" aria-label="Store management">
+        <a class="portal-nav-link {% if request.resolver_match.url_name == 'overview' %}is-active{% endif %}" href="{% url 'dashboard:overview' %}"><span class="portal-nav-icon">⌂</span>Overview</a>
+        <a class="portal-nav-link {% if request.resolver_match.url_name == 'products' or request.resolver_match.url_name == 'product_edit' %}is-active{% endif %}" href="{% url 'dashboard:products' %}"><span class="portal-nav-icon">▦</span>Products</a>
+        <a class="portal-nav-link {% if request.resolver_match.url_name == 'product_create' %}is-active{% endif %}" href="{% url 'dashboard:product_create' %}"><span class="portal-nav-icon">＋</span>Add product</a>
+        <a class="portal-nav-link {% if request.resolver_match.url_name == 'stores' or request.resolver_match.url_name == 'store_create' or request.resolver_match.url_name == 'store_edit' %}is-active{% endif %}" href="{% url 'dashboard:stores' %}"><span class="portal-nav-icon">⌖</span>Stores & PINs</a>
+        <a class="portal-nav-link {% if request.resolver_match.url_name == 'orders' %}is-active{% endif %}" href="{% url 'dashboard:orders' %}"><span class="portal-nav-icon">▤</span>Orders</a>
+        <a class="portal-nav-link {% if request.resolver_match.url_name == 'contacts' %}is-active{% endif %}" href="{% url 'dashboard:contacts' %}"><span class="portal-nav-icon">◎</span>Contacts</a>
+        <a class="portal-nav-link {% if request.resolver_match.url_name == 'inquiries' %}is-active{% endif %}" href="{% url 'dashboard:inquiries' %}"><span class="portal-nav-icon">✉</span>Messages</a>
+      </nav>
+      <div class="portal-sidebar-bottom">
+        <a class="portal-shop-link" href="{% url 'website:home' %}">View storefront <span>↗</span></a>
+        <div class="portal-user">
+          <span class="portal-avatar">{{ user.first_name|default:user.username|slice:":1"|upper }}</span>
+          <span class="portal-user-info"><b>{{ user.get_full_name|default:user.username }}</b><small>Store staff</small></span>
+          <form method="post" action="{% url 'website:logout' %}">{% csrf_token %}<button class="portal-signout" type="submit" aria-label="Sign out">↗</button></form>
+        </div>
+      </div>
+    </aside>
+    <main class="portal-main">
+      <header class="portal-topbar">
+        <div><span class="portal-breadcrumb">Store portal</span><span class="portal-breadcrumb-separator">/</span><span class="portal-current-page">{% block portal_section %}Overview{% endblock %}</span></div>
+        <div class="portal-topbar-actions">
+          <a href="{% url 'website:home' %}" class="portal-topbar-store">Open storefront <span>↗</span></a>
+          <form class="portal-mobile-signout" method="post" action="{% url 'website:logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
+        </div>
+      </header>
+      {% if messages %}
+        <div class="portal-messages" aria-live="polite">
+          {% for message in messages %}<div class="notice notice-{{ message.tags }}">{{ message }}</div>{% endfor %}
+        </div>
+      {% endif %}
+      <div class="portal-content">{% block content %}{% endblock %}</div>
+    </main>
+  </div>
+  <script src="{% static 'website/messages.js' %}" defer></script>
+</body>
+</html>

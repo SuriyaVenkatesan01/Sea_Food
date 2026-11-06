@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Contacts{% endblock %}
+{% block portal_section %}Contacts{% endblock %}
+{% block content %}
+<section class="dashboard-page">
+  <div class="wrap dashboard-wrap">
+    <header class="dashboard-heading">
+      <div><span class="eyebrow">CUSTOMER SUPPORT</span><h1>Contacts</h1><p>Messages submitted through the storefront contact form.</p></div>
+    </header>
+    <form class="dashboard-filter" method="get">
+      <label class="sr-only" for="contact-search">Search contacts</label>
+      <input id="contact-search" name="q" value="{{ query }}" placeholder="Name, phone, email, subject, or message">
+      <button class="button button-green" type="submit">Search contacts</button>
+    </form>
+    <section class="dash-panel orders-panel">
+      <div class="panel-heading"><div><h2>Contact submissions</h2><p>{{ page.paginator.count }} message{{ page.paginator.count|pluralize }}</p></div></div>
+      <div class="orders-table-wrap">
+        <table class="orders-table contact-submissions-table">
+          <thead><tr><th scope="col">CUSTOMER</th><th scope="col">EMAIL</th><th scope="col">PHONE</th><th scope="col">SUBJECT</th><th scope="col">MESSAGE</th><th scope="col">SUBMITTED</th><th scope="col">STATUS</th></tr></thead>
+          <tbody>
+            {% for contact in contacts %}
+              <tr>
+                <td><b>{{ contact.name }}</b></td>
+                <td><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></td>
+                <td>{% if contact.phone %}<a href="tel:{{ contact.phone }}">{{ contact.phone }}</a>{% else %}<span class="muted-text">Not provided</span>{% endif %}</td>
+                <td>{{ contact.subject }}</td>
+                <td class="contact-message-cell">{{ contact.message|linebreaksbr }}</td>
+                <td>{{ contact.created_at|date:"M j, Y · g:i A" }}</td>
+                <td><span class="status-badge {% if contact.is_resolved %}status-delivered{% else %}status-new{% endif %}">{% if contact.is_resolved %}Resolved{% else %}Needs reply{% endif %}</span></td>
+              </tr>
+            {% empty %}
+              <tr><td class="table-empty" colspan="7">No contact submissions yet. New storefront messages will appear here.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% if page.has_other_pages %}<nav class="pagination" aria-label="Contact submission pages">
+      {% if page.has_previous %}<a href="?q={{ query|urlencode }}&page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+      <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a href="?q={{ query|urlencode }}&page={{ page.next_page_number }}">Next →</a>{% endif %}
+    </nav>{% endif %}
+  </div>
+</section>
+{% endblock %}

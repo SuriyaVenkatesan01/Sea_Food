@@ -1,0 +1,27 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{% if is_new %}Add product{% else %}Edit product{% endif %}{% endblock %}
+{% block portal_section %}{% if is_new %}Add product{% else %}Edit product{% endif %}{% endblock %}
+{% block content %}
+<section class="dashboard-page">
+  <div class="wrap dashboard-wrap">
+    <header class="dashboard-heading">
+      <div><span class="eyebrow">CATALOG & STOCK</span><h1>{% if is_new %}Add a product{% else %}Edit product{% endif %}</h1><p>Update the details customers see in your seafood shop.</p></div>
+      <a class="button button-outline" href="{% url 'dashboard:products' %}">← Back to products</a>
+    </header>
+    <form class="dash-panel product-form" method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="product-form-grid">
+      {% for field in form %}
+        <div class="dashboard-field {% if field.name == 'description' or field.name == 'image_url' %}field-wide{% endif %} {% if field.field.widget.input_type == 'checkbox' %}checkbox-field{% endif %}">
+          {% if field.field.widget.input_type == 'checkbox' %}{{ field }}{{ field.label_tag }}{% else %}{{ field.label_tag }}{{ field }}{% endif %}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+        </div>
+      {% endfor %}
+      </div>
+      <div class="product-form-actions"><a class="button button-outline" href="{% url 'dashboard:products' %}">Cancel</a><button class="button button-green" type="submit">{% if is_new %}Add product{% else %}Save changes{% endif %}</button></div>
+    </form>
+  </div>
+</section>
+{% endblock %}

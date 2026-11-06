@@ -1,0 +1,90 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#087f70">
+  <title>{% block title %}Tide & Table — Fresh seafood, delivered{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'website/site.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="topline">
+    <span>Fresh catch, delivered to your door</span>
+    <div class="delivery-area-control">
+      {% if delivery_store %}<span>Delivering to {{ delivery_postcode }} · {{ delivery_store.name }}</span>{% else %}<span>Choose your delivery area</span>{% endif %}
+      <button type="button" data-open-delivery-modal>{% if delivery_store %}Change{% else %}Check PIN{% endif %}</button>
+    </div>
+  </div>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="{% url 'website:home' %}"><span class="brand-mark">T<span>+</span></span><span>TIDE<span class="brand-amp">&</span>TABLE<small>SEAFOOD MARKET</small></span></a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="{% url 'website:home' %}">Home</a>
+        <a href="{% url 'website:products' %}">Products</a>
+        <a href="{% url 'website:about' %}">About</a>
+        <a href="{% url 'website:contact' %}">Contact</a>
+        <a href="{% url 'website:track_guest_order' %}">Track order</a>
+      </nav>
+      <div class="nav-actions">
+        {% if user.is_authenticated %}
+          {% if user.is_staff %}<a class="text-link admin-link" href="{% url 'dashboard:overview' %}">Dashboard</a>{% else %}<a class="text-link admin-link" href="{% url 'website:track_orders' %}">My orders</a>{% endif %}
+          <form class="nav-logout" method="post" action="{% url 'website:logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
+        {% else %}
+          <a class="text-link sign-in-link" href="{% url 'website:login' %}">Sign in</a>
+        {% endif %}
+        <a class="cart-link" href="{% url 'website:cart' %}" aria-label="Basket, {{ cart_count }} items">
+          <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h10a2 2 0 0 0 2-1.6L22 8H5"></path></svg>
+          <span>Basket</span><b>{{ cart_count }}</b>
+        </a>
+      </div>
+    </div>
+  </header>
+    <div class="delivery-modal-backdrop"{% if delivery_postcode or delivery_prompt_dismissed %} hidden{% endif %} data-delivery-modal role="presentation">
+      <section class="delivery-modal" role="dialog" aria-modal="true" aria-labelledby="delivery-modal-title">
+        <form class="delivery-modal-close-form" method="post" action="{% url 'website:dismiss_delivery_prompt' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="delivery-modal-close" type="submit" aria-label="Close delivery PIN prompt">×</button>
+        </form>
+        <span class="eyebrow">LOCAL SEAFOOD, DELIVERED FRESH</span>
+        <h1 id="delivery-modal-title">Where should we deliver?</h1>
+        <p>Enter your six-digit PIN code to check delivery coverage and find your serving store.</p>
+        <form class="delivery-modal-form" method="post" action="{% url 'website:select_delivery_area' %}" data-pincode-form data-lookup-url="{% url 'website:lookup_delivery_postcode' %}" data-geocode-url="{% url 'website:lookup_location_postcode' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="latitude" data-location-latitude>
+          <input type="hidden" name="longitude" data-location-longitude>
+          <label for="first-delivery-postcode">Delivery PIN code</label>
+          <input id="first-delivery-postcode" name="postcode" value="{{ delivery_postcode }}" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="Enter 6-digit PIN" autocomplete="postal-code" required{% if not delivery_postcode %} autofocus{% endif %}>
+          <span class="pincode-feedback modal-pincode-feedback" data-pincode-feedback aria-live="polite"></span>
+          <button type="button" class="button button-outline button-full" data-location-button>Use my location to find the nearest store</button>
+          <button class="button button-green button-full" type="submit">Check PIN availability <span>→</span></button>
+        </form>
+        <small>Location is optional. Choose the location button to find your PIN and nearest serving store. You can close this window at any time.</small>
+      </section>
+    </div>
+  {% if messages %}
+    <div class="message-stack" aria-live="polite">
+      {% for message in messages %}<div class="notice notice-{{ message.tags }}">{{ message }}</div>{% endfor %}
+    </div>
+  {% endif %}
+  <main>{% block content %}{% endblock %}</main>
+  <footer class="site-footer">
+    <div class="footer-grid wrap">
+      <div><a class="brand footer-brand" href="{% url 'website:home' %}"><span class="brand-mark">T<span>+</span></span><span>TIDE<span class="brand-amp">&</span>TABLE<small>SEAFOOD MARKET</small></span></a><p>Good seafood should feel simple. We bring the day’s freshest catch straight to your kitchen.</p></div>
+      <div><h3>Explore</h3><a href="{% url 'website:products' %}">Shop all seafood</a><a href="{% url 'website:about' %}">About us</a><a href="{% url 'website:cart' %}">Your basket</a><a href="{% url 'website:track_guest_order' %}">Track your order</a><a href="{% url 'dashboard:login' %}">Store dashboard</a></div>
+      <div><h3>We’re here to help</h3><p>Questions about today’s catch?</p><a href="{% url 'website:contact' %}">Contact the store</a><a href="mailto:hello@tideandtable.example">hello@tideandtable.example</a><p>Mon–Sun · 7:00 AM–9:00 PM</p></div>
+    </div>
+    <div class="footer-bottom wrap"><span>© {% now "Y" %} Tide & Table</span><span>Fresh catch. Thoughtfully packed.</span></div>
+  </footer>
+  <script src="{% static 'website/messages.js' %}" defer></script>
+  <script src="{% static 'website/shop.js' %}?v=3" defer></script>
+  <script src="{% static 'website/contact.js' %}" defer></script>
+  <script src="{% static 'website/pincode.js' %}" defer></script>
+</body>
+</html>

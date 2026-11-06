@@ -1,0 +1,34 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Customer messages{% endblock %}
+{% block portal_section %}Messages{% endblock %}
+{% block content %}
+<section class="dashboard-page">
+  <div class="wrap dashboard-wrap">
+    <header class="dashboard-heading">
+      <div><span class="eyebrow">CUSTOMER SUPPORT</span><h1>Messages</h1><p>Contact form submissions sent from your storefront.</p></div>
+    </header>
+    <form class="dashboard-filter" method="get">
+      <label class="sr-only" for="inquiry-search">Search messages</label>
+      <input id="inquiry-search" name="q" value="{{ query }}" placeholder="Name, email, subject, or message">
+      <button class="button button-green" type="submit">Search messages</button>
+    </form>
+    {% for inquiry in inquiries %}
+      <article class="dash-panel inquiry-card">
+        <header class="inquiry-header">
+          <div><span class="status-badge {% if inquiry.is_resolved %}status-delivered{% else %}status-new{% endif %}">{% if inquiry.is_resolved %}Resolved{% else %}Needs reply{% endif %}</span><h2>{{ inquiry.subject }}</h2><p>{{ inquiry.created_at|date:"M j, Y · g:i A" }}</p></div>
+          <form method="post" action="{% url 'dashboard:resolve_inquiry' inquiry.id %}">{% csrf_token %}<button class="button button-outline" type="submit">{% if inquiry.is_resolved %}Reopen{% else %}Mark resolved{% endif %}</button></form>
+        </header>
+        <div class="inquiry-contact"><b>{{ inquiry.name }}</b><a href="mailto:{{ inquiry.email }}">{{ inquiry.email }}</a>{% if inquiry.phone %}<a href="tel:{{ inquiry.phone }}">{{ inquiry.phone }}</a>{% endif %}</div>
+        <p class="inquiry-message">{{ inquiry.message|linebreaksbr }}</p>
+      </article>
+    {% empty %}
+      <section class="dash-panel inquiry-empty"><h2>No messages yet</h2><p>New contact form submissions will appear here.</p></section>
+    {% endfor %}
+    {% if page.has_other_pages %}<nav class="pagination" aria-label="Message pages">
+      {% if page.has_previous %}<a href="?q={{ query|urlencode }}&page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+      <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a href="?q={{ query|urlencode }}&page={{ page.next_page_number }}">Next →</a>{% endif %}
+    </nav>{% endif %}
+  </div>
+</section>
+{% endblock %}
